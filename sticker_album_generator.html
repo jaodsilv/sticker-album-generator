@@ -1,0 +1,1257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sticker Album Template</title>
+    <style>
+        body {
+            font-family: 'Comic Sans MS', Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(45deg, #ff9a9e, #fecfef, #fecfef, #a8edea);
+            min-height: 100vh;
+        }
+
+        h3 {
+            margin-block-start: 0px;
+            margin-block-end: 9px;
+        }
+
+        .page-selector {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .control-group label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 3px;
+        }
+
+        .control-group input {
+            padding: 5px 8px;
+            border: 2px solid #ff6b9d;
+            border-radius: 8px;
+            width: 60px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .page-selector button {
+            background: #ff6b9d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .page-selector button:hover {
+            background: #e55a87;
+        }
+
+        .page-selector button.active {
+            background: #4ecdc4;
+        }
+
+        .album-page {
+            width: 10.5in;
+            height: 8in;
+            background: white;
+            margin: 0 auto;
+            padding: 10px;
+            box-sizing: border-box;
+            border: 3px solid #ff6b9d;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            display: none;
+        }
+
+        .album-page.active {
+            display: block;
+        }
+
+        .tabloid-page {
+            width: 16.5in;
+            height: 10.5in;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 15px;
+            border-bottom: 3px solid #4ecdc4;
+            padding-bottom: 8px;
+        }
+
+        .page-title {
+            font-size: 24px;
+            color: #ff6b9d;
+            margin: 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .page-subtitle {
+            font-size: 14px;
+            color: #666;
+            margin: 3px 0;
+        }
+
+        .milestone-tracker {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 9px 9px 9px 9px;
+            border-radius: 15px;
+            margin-top: 10px;
+            text-align: center;
+            height: 88px;
+            box-sizing: border-box;
+        }
+
+        .tabloid-page .milestone-tracker {
+            margin-top: 10px;
+            height: 98px;
+        }
+
+        .milestone-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: nowrap;
+            gap: 8px;
+            overflow-x: auto;
+        }
+
+        .milestone {
+            background: white;
+            border: 2px solid #ff6b9d;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 12px;
+            color: #ff6b9d;
+            flex-shrink: 0;
+        }
+
+        .small-circle {
+            background: white;
+            border: 2px solid #ff6b9d;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
+        }
+
+        .dynamic-milestone {
+            min-width: 25px;
+            min-height: 25px;
+        }
+
+        .dynamic-small {
+            min-width: 12px;
+            min-height: 12px;
+        }
+
+        .milestone.achieved {
+            background: #4ecdc4;
+            border-color: #4ecdc4;
+        }
+
+        .sticker-grid {
+            position: relative;
+            height: 525px;
+            padding: 15px;
+            background: linear-gradient(45deg, #ffeef8, #f0f8ff);
+            border-radius: 15px;
+            border: 2px dashed #ff6b9d;
+        }
+
+        .tabloid-page .sticker-grid {
+            height: 755px;
+        }
+
+        .sticker-spot {
+            position: absolute;
+            border: 2px dashed #ccc;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            transition: all 0.3s ease;
+        }
+
+        .sticker-spot:hover {
+            border-color: #ff6b9d;
+            background: #fff5f8;
+        }
+
+        .sticker-spot.filled {
+            background: #4ecdc4;
+            border-color: #4ecdc4;
+            color: white;
+        }
+
+        .sticker-number {
+            position: absolute;
+            top: -8px;
+            left: -8px;
+            background: #ff6b9d;
+            color: white;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            font-weight: bold;
+        }
+
+        .emoji-decoration {
+            position: absolute;
+            user-select: none;
+            pointer-events: none;
+            line-height: 1;
+        }
+
+        @media print {
+            body { background: white; }
+            .page-selector, .controls { display: none; }
+            .album-page { box-shadow: none; }
+        }
+
+        /* Category Selector Styles */
+        .category-selector {
+            position: relative;
+            width: 200px;
+        }
+
+        .category-button {
+            padding: 5px 8px;
+            border: 2px solid #ff6b9d;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            text-align: center;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            min-height: 20px;
+            width: 100%;
+            font-family: inherit;
+            font-size: inherit;
+        }
+
+        .category-button:hover {
+            background: #fefefe;
+        }
+
+        .toggle-arrow {
+            font-size: 12px;
+            color: #ff6b9d;
+            transition: transform 0.2s ease;
+            user-select: none;
+        }
+
+        .category-list {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 2px solid #ff6b9d;
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            animation: slideDown 0.2s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .category-option {
+            padding: 8px 12px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            background: white;
+        }
+
+        .category-option:hover {
+            background: #f8f8f8;
+        }
+
+        .category-option:last-child {
+            border-bottom: none;
+        }
+
+        .category-option input[type="checkbox"] {
+            margin: 0;
+            width: auto;
+            border: none;
+            cursor: pointer;
+            transform: scale(1.2);
+        }
+
+        .category-option span {
+            margin: 0;
+            cursor: pointer;
+            font-size: 12px;
+            color: #333;
+            user-select: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="page-selector">
+        <button onclick="showPage('letter')" class="active" id="letter-btn">Letter Size (11" × 8.5")</button>
+        <button onclick="showPage('tabloid')" id="tabloid-btn">Tabloid Size (17" × 11")</button>
+    </div>
+
+    <div class="controls">
+        <div class="control-group">
+            <label>Page Number</label>
+            <input type="number" id="pageNumber" value="1" min="1">
+        </div>
+        <div class="control-group">
+            <label>Start Number</label>
+            <input type="number" id="startNumber" value="1" min="1">
+        </div>
+        <div class="control-group">
+            <label>Emoji Count</label>
+            <input type="number" id="emojiCount" value="15" min="0" max="50">
+        </div>
+        <div class="control-group">
+            <label>Emoji Size (px)</label>
+            <input type="text" id="emojiSize" value="16-28" placeholder="16-28">
+        </div>
+        <div class="control-group">
+            <label>Emoji Categories</label>
+            <div class="category-selector">
+                <button type="button" class="category-button" onclick="toggleCategoryList()">
+                    <span id="selectedCategoriesDisplay">All Categories</span>
+                    <span class="toggle-arrow">▼</span>
+                </button>
+                <div class="category-list" id="categoryList" style="display: none;">
+                    <label class="category-option">
+                        <input type="checkbox" id="cat-all" value="all" checked>
+                        <span>All Categories</span>
+                    </label>
+                    <label class="category-option">
+                        <input type="checkbox" id="cat-nature" value="nature">
+                        <span>Nature</span>
+                    </label>
+                    <label class="category-option">
+                        <input type="checkbox" id="cat-animals" value="animals">
+                        <span>Animals</span>
+                    </label>
+                    <label class="category-option">
+                        <input type="checkbox" id="cat-food" value="food">
+                        <span>Food</span>
+                    </label>
+                    <label class="category-option">
+                        <input type="checkbox" id="cat-activities" value="activities">
+                        <span>Activities</span>
+                    </label>
+                    <label class="category-option">
+                        <input type="checkbox" id="cat-transportation" value="transportation">
+                        <span>Transportation</span>
+                    </label>
+                    <label class="category-option">
+                        <input type="checkbox" id="cat-people" value="people">
+                        <span>People</span>
+                    </label>
+                    <label class="category-option">
+                        <input type="checkbox" id="cat-objects" value="objects">
+                        <span>Objects</span>
+                    </label>
+                    <label class="category-option">
+                        <input type="checkbox" id="cat-symbols" value="symbols">
+                        <span>Symbols</span>
+                    </label>
+                    <label class="category-option">
+                        <input type="checkbox" id="cat-ourFlags" value="ourFlags">
+                        <span>Our Flags</span>
+                    </label>
+                    <label class="category-option">
+                        <input type="checkbox" id="cat-worldFlags" value="worldFlags">
+                        <span>World Flags</span>
+                    </label>
+                    <label class="category-option">
+                        <input type="checkbox" id="cat-fantasy" value="fantasy">
+                        <span>Fantasy</span>
+                    </label>
+                    <label class="category-option">
+                        <input type="checkbox" id="cat-faces" value="faces">
+                        <span>Faces</span>
+                    </label>
+                    <label class="category-option">
+                        <input type="checkbox" id="cat-halloween" value="halloween">
+                        <span>Halloween</span>
+                    </label>
+                    <label class="category-option">
+                        <input type="checkbox" id="cat-zodiac" value="zodiac">
+                        <span>Zodiac</span>
+                    </label>
+                    <label class="category-option">
+                        <input type="checkbox" id="cat-chineseZodiac" value="chineseZodiac">
+                        <span>Chinese Zodiac</span>
+                    </label>
+                    <label class="category-option">
+                        <input type="checkbox" id="cat-christmas" value="christmas">
+                        <span>Christmas</span>
+                    </label>
+                    <label class="category-option">
+                        <input type="checkbox" id="cat-sports" value="sports">
+                        <span>Sports</span>
+                    </label>
+                    <label class="category-option">
+                        <input type="checkbox" id="cat-music" value="music">
+                        <span>Music</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class="control-group">
+            <label>Max Retries</label>
+            <input type="number" id="minBlocks" value="20" min="5" max="50">
+        </div>
+        <div class="control-group">
+            <label>Emoji Distribution Intensity</label>
+            <select id="distributionIntensity" style="padding: 5px 8px; border: 2px solid #ff6b9d; border-radius: 8px; width: 120px; text-align: center; font-weight: bold;">
+                <option value="balanced">Balanced</option>
+                <option value="strong">Strong</option>
+                <option value="weak">Weak</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <button onclick="regenerateStickers()" style="background: #4ecdc4; color: white; border: none; padding: 8px 15px; border-radius: 8px; cursor: pointer; margin-top: 17px;">Generate</button>
+        </div>
+        <div class="control-group">
+            <div id="quadrantDebug" style="font-size: 11px; color: #666; margin-top: 5px; text-align: center; min-width: 120px;">
+                Quadrant Distribution: <br>TL: 0 | TR: 0 | BL: 0 | BR: 0
+            </div>
+        </div>
+    </div>
+
+    <!-- Letter Size Page -->
+    <div class="album-page active" id="letter-page">
+        <div class="page-header">
+            <h1 class="page-title">🌟 Elisa's Sticker Album 🌟</h1>
+            <p class="page-subtitle">Page <span id="pageNumberDisplay">1</span> - Great Behavior Rewards!</p>
+        </div>
+
+        <div class="sticker-grid" id="letter-grid">
+            <!-- Sticker spots generated dynamically -->
+        </div>
+
+        <div class="milestone-tracker">
+            <h3>🎯 Milestone Tracker</h3>
+            <div class="milestone-row" id="letter-milestones">
+                <!-- Milestones generated dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabloid Size Page -->
+    <div class="album-page tabloid-page" id="tabloid-page">
+        <div class="page-header">
+            <h1 class="page-title">🌟 Elisa's Sticker Album 🌟</h1>
+            <p class="page-subtitle">Page <span id="pageNumberDisplay2">1</span> - Great Behavior Rewards!</p>
+        </div>
+
+        <div class="sticker-grid" id="tabloid-grid">
+            <!-- Sticker spots generated dynamically -->
+        </div>
+
+        <div class="milestone-tracker">
+            <h3>🎯 Milestone Tracker</h3>
+            <div class="milestone-row" id="tabloid-milestones">
+                <!-- Milestones generated dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Bell curve distribution function
+        function bellCurveSize() {
+            const u1 = Math.random();
+            const u2 = Math.random();
+            const z0 = Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
+
+            const mean = 108;
+            const stdDev = 18;
+
+            let size = mean + z0 * stdDev;
+            size = Math.max(36, Math.min(180, size));
+
+            return Math.round(size);
+        }
+
+        // Generate random emoji decorations
+        function generateEmojiDecorations(gridId, finalSpots, emojiCountParam) {
+            const grid = document.getElementById(gridId);
+            const gridWidth = gridId === 'letter-grid' ? 960 : 1536;
+            const gridHeight = gridId === 'letter-grid' ? 525 : 760;
+
+            const emojiCategories = {
+                // Repeate the preferred emojis within each category so they have higher probability of showing up
+                // TODO: Add more categories to consider different divisions of the emojis
+                nature: [
+                    '☀️', '☃', '☄', '⛄', '⚡', '☘', '❄', '🌊', '🌍', '🌎', '🌏',
+                    '🌕', '🌚', '🌛', '🌜', '🌞', '🌠', '🌨', '🌬', '🌳', '🌷',
+                    '🌸', '🌹', '🌺', '🌻', '🌼', '🌿', '🍀', '🦋', '🦗', '🦘',
+                    '🦙', '🦚', '🦜', '🦝', '🦞', '🦟', '🦠', '🦢', '🦩', '🪐'
+                ],
+                animals: [
+                    '🐇', '🐈', '🐉', '🐊', '🐋', '🐌', '🐍', '🐎', '🐓', '🐔',
+                    '🐕', '🐗', '🐘', '🐙', '🐚', '🐛', '🐜', '🐝', '🐞', '🐟',
+                    '🐠', '🐡', '🐢', '🐣', '🐤', '🐥', '🐦', '🐧', '🐨', '🐩',
+                    '🐫', '🐬', '🐭', '🐮', '🐯', '🐰', '🐱', '🐲', '🐳', '🐴',
+                    '🐵', '🐶', '🐷', '🐸', '🐹', '🐺', '🐻', '🐼', '🦀', '🦁',
+                    '🦂', '🦃', '🦄', '🦅', '🦆', '🦇', '🦈', '🦉', '🦊', '🦋',
+                    '🦎', '🦐', '🦑', '🦒', '🦓', '🦔', '🦕', '🦖', '🦗', '🦘',
+                    '🦙', '🦚', '🦜', '🦝', '🦞', '🦟', '🦠', '🦢', '🦩', '🕊',
+                    '🕷', '🕸'
+                ],
+                food: [
+                    '🌭', '🍇', '🍌', '🍎', '🍓', '🍕', '🍟', '🍦', '🍨', '🥀',
+                    '🥐', '🥕', '🥞', '🥟', '🧇'
+                ],
+                activities: [
+                    '⚽', '⛱', '⛷', '⛸', '🎀', '🎁', '🎆', '🎇', '🎈', '🎉',
+                    '🎊', '🎋', '🎍', '🎏', '🎐', '🎑', '🎞', '🎟', '🎠', '🎡',
+                    '🎢', '🎤', '🎧', '🎨', '🎪', '🎫', '🎭', '🎮', '🎯', '🎱',
+                    '🎲', '🎷', '🎸', '🎹', '🎺', '🎻', '🎿', '🏂', '🏃‍♀️', '🏄‍♀️',
+                    '🏆', '🏇', '🏔', '🏵', '🏷', '🤸‍♀️', '🤿', '🪀', '🪁', '🪕',
+                    '🥁', '🥅', '🥇', '🥏', 
+                ],
+                transportation: [
+                    '🚀', '🚁', '🚂', '🚍', '🚒', '🚓', '🚗', '🛩', '🛫', '🛶',
+                    '🛷', '🛸'
+                ],
+                people: [
+                    '👨‍👩‍👧', '👩‍🚀', '👩‍🚒', '👸', '🧙‍♀️', '🧚‍♀️', '🧛‍♀️', '🧜‍♀️',
+                    '🦸‍♀️', '🦹‍♀️'
+                ],
+                objects: [
+                    '💄', '💌', '💍', '💎', '💐', '📚', '📯', '🖼', '🧵', '🧶',
+                    '🧸', '🧧',
+                ],
+                symbols: [
+                    '♥', '✨', '❣', '❤', '⭐', '🌈', '👍', '👓', '💓', '💕',
+                    '💖', '💗', '💘', '💙', '💚', '💛', '💜', '💝', '💞', '💟',
+                    '💫', '🖖', '🖤', '🤍', '🤎', '🤟', '🧡',
+                    '🧬'
+                ],
+                ourFlags: [
+                    '🇧🇷', '🇺🇸'
+                ],
+                worldFlags: [
+                    // TODO: Verify which flags work in Firefox
+                    // Other flags
+                    '🎌', '🏳️‍🌈', '🏴‍☠️',
+                    // United Nations
+                    '🇺🇳',
+                    // Africa
+                    /* Angola */ '🇦🇴', /* Burkina Faso */ '🇧🇫', /* Burundi */ '🇧🇮', /* Benin */ '🇧🇯',
+                    /* Botswana */ '🇧🇼', /* Congo - Kinshasa */ '🇨🇩', /* Central African Republic */ '🇨🇫',
+                    /* Congo - Brazzaville */ '🇨🇬', /* Côte d'Ivoire */ '🇨🇮', /* Cameroon */ '🇨🇲',
+                    /* Cape Verde */ '🇨🇻', /* Djibouti */ '🇩🇯', /* Algeria */ '🇩🇿', /* Egypt */ '🇪🇬',
+                    /* Western Sahara */ '🇪🇭', /* Eritrea */ '🇪🇷', /* Ethiopia */ '🇪🇹', /* Gabon */ '🇬🇦',
+                    /* Ghana */ '🇬🇭', /* Gambia */ '🇬🇲', /* Guinea */ '🇬🇳', /* Equatorial Guinea */ '🇬🇶',
+                    /* Guinea-Bissau */ '🇬🇼', /* Kenya */ '🇰🇪', /* Comoros */ '🇰🇲', /* Liberia */ '🇱🇷',
+                    /* Lesotho */ '🇱🇸', /* Libya */ '🇱🇾', /* Morocco */ '🇲🇦', /* Madagascar */ '🇲🇬',
+                    /* Mali */ '🇲🇱', /* Mauritania */ '🇲🇷', /* Mauritius */ '🇲🇺', /* Malawi */ '🇲🇼',
+                    /* Mozambique */ '🇲🇿', /* Namibia */ '🇳🇦', /* Niger */ '🇳🇪', /* Nigeria */ '🇳🇬',
+                    /* Rwanda */ '🇷🇼', /* Seychelles */ '🇸🇨', /* Sudan */ '🇸🇩', /* Sierra Leone */ '🇸🇱',
+                    /* Senegal */ '🇸🇳', /* Somalia */ '🇸🇴', /* South Sudan */ '🇸🇸', /* Eswatini */ '🇸🇿',
+                    /* Chad */ '🇹🇩', /* Togo */ '🇹🇬', /* Tunisia */ '🇹🇳', /* Tanzania */ '🇹🇿',
+                    /* Uganda */ '🇺🇬', /* South Africa */ '🇿🇦', /* Zambia */ '🇿🇲', /* Zimbabwe */ '🇿🇼',
+
+                    // The Americas
+                    /* Antigua & Barbuda */ '🇦🇬', /* Anguilla */ '🇦🇮', /* Argentina */ '🇦🇷', /* Aruba */ '🇦🇼',
+                    /* Barbados */ '🇧🇧', /* St. Barthélemy */ '🇧🇱', /* Bermuda */ '🇧🇲', /* Bolivia */ '🇧🇴',
+                    /* Caribbean Netherlands */ '🇧🇶', /* Brazil */ '🇧🇷', /* Bahamas */ '🇧🇸', /* Belize */ '🇧🇿',
+                    /* Canada */ '🇨🇦', /* Chile */ '🇨🇱', /* Colombia */ '🇨🇴', /* Costa Rica */ '🇨🇷',
+                    /* Cuba */ '🇨🇺', /* Curaçao */ '🇨🇼', /* Dominica */ '🇩🇲', /* Dominican Republic */ '🇩🇴',
+                    /* Ecuador */ '🇪🇨', /* Falkland Islands */ '🇫🇰', /* Grenada */ '🇬🇩',
+                    /* French Guiana */ '🇬🇫', /* Guadeloupe */ '🇬🇵', /* Guatemala */ '🇬🇹', /* Guyana */ '🇬🇾',
+                    /* Honduras */ '🇭🇳', /* Haiti */ '🇭🇹', /* Jamaica */ '🇯🇲', /* St. Kitts & Nevis */ '🇰🇳',
+                    /* Cayman Islands */ '🇰🇾', /* St. Lucia */ '🇱🇨', /* St. Martin */ '🇲🇫',
+                    /* Martinique */ '🇲🇶', /* Montserrat */ '🇲🇸', /* Mexico */ '🇲🇽', /* Nicaragua */ '🇳🇮',
+                    /* Panama */ '🇵🇦', /* Peru */ '🇵🇪', /* St. Pierre & Miquelon */ '🇵🇲',
+                    /* Puerto Rico */ '🇵🇷', /* Paraguay */ '🇵🇾', /* Suriname */ '🇸🇷', /* El Salvador */ '🇸🇻',
+                    /* Sint Maarten */ '🇸🇽', /* Turks & Caicos Islands */ '🇹🇨', /* Trinidad & Tobago */ '🇹🇹',
+                    /* United States */ '🇺🇸', /* Uruguay */ '🇺🇾', /* Venezuela */ '🇻🇪',
+                    /* British Virgin Islands */ '🇻🇬', /* U.S. Virgin Islands */ '🇻🇮',
+                    
+                    // Asia & The Middle East
+                    /* United Arab Emirates */ '🇦🇪', /* Afghanistan */ '🇦🇫', /* Azerbaijan */ '🇦🇿',
+                    /* Bangladesh */ '🇧🇩', /* Bahrain */ '🇧🇭', /* Brunei */ '🇧🇳', /* Bhutan */ '🇧🇹',
+                    /* China */ '🇨🇳', /* Hong Kong SAR China */ '🇭🇰', /* Indonesia */ '🇮🇩', /* Israel */ '🇮🇱',
+                    /* India */ '🇮🇳', /* Iraq */ '🇮🇶', /* Iran */ '🇮🇷', /* Jordan */ '🇯🇴', /* Japan */ '🇯🇵',
+                    /* Kyrgyzstan */ '🇰🇬', /* Cambodia */ '🇰🇭', /* North Korea */ 'KP', /* South Korea */ '🇰🇷',
+                    /* Kuwait */ '🇰🇼', /* Kazakhstan */ '🇰🇿', /* Laos */ '🇱🇦', /* Lebanon */ '🇱🇧',
+                    /* Sri Lanka */ '🇱🇰', /* Myanmar (Burma) */ '🇲🇲', /* Mongolia */ '🇲🇳',
+                    /* Macao Sar China */ '🇲🇴', /* Maldives */ '🇲🇻', /* Malaysia */ '🇲🇾', /* Nepal */ '🇳🇵',
+                    /* Oman */ '🇴🇲', /* Philippines */ '🇵🇭', /* Pakistan */ '🇵🇰',
+                    /* Palestinian Territories */ '🇵🇸', /* Qatar */ '🇶🇦', /* Russia */ '🇷🇺',
+                    /* Saudi Arabia */ '🇸🇦', /* Singapore */ '🇸🇬', /* Syria */ '🇸🇾', /* Thailand */ '🇹🇭',
+                    /* Tajikistan */ '🇹🇯', /* Timor-Leste */ '🇹🇱', /* Turkmenistan */ '🇹🇲',
+                    /* Türkiye */ '🇹🇷', /* Taiwan */ '🇹🇼', /* Uzbekistan */ '🇺🇿', /* Vietnam */ '🇻🇳',
+                    /* Yemen */ '🇾🇪',
+                    
+                    // Europe
+                    /* Andorra */ '🇦🇩', /* Albania */ '🇦🇱', /* Armenia */ '🇦🇲', /* Austria */ '🇦🇹',
+                    /* Bosnia & Herzegovina */ '🇧🇦', /* Belgium */ '🇧🇪', /* Bulgaria */ '🇧🇬',
+                    /* Belarus */ '🇧🇾', /* Switzerland */ '🇨🇭', /* Sark */ '🇨🇶', /* Cyprus */ '🇨🇾',
+                    /* Czechia */ '🇨🇿', /* Germany */ '🇩🇪', /* Denmark */ '🇩🇰', /* Ceuta & Melilla */ '🇪🇦',
+                    /* Estonia */ '🇪🇪', /* Spain */ '🇪🇸', /* European Union */ '🇪🇺', /* Finland */ '🇫🇮',
+                    /* France */ '🇫🇷', /* United Kingdom */ '🇬🇧', /* Georgia */ '🇬🇪', /* Guernsey */ '🇬🇬',
+                    /* Gibraltar */ '🇬🇮', /* Greece */ '🇬🇷', /* Croatia */ '🇭🇷', /* Hungary */ '🇭🇺',
+                    /* Ireland */ '🇮🇪', /* Isle of Man */ '🇮🇲', /* Iceland */ '🇮🇸', /* Italy */ '🇮🇹',
+                    /* Jersey */ '🇯🇪', /* Liechtenstein */ '🇱🇮', /* Lithuania */ '🇱🇹', /* Luxembourg */ '🇱🇺',
+                    /* Latvia */ '🇱🇻', /* Monaco */ '🇲🇨', /* Moldova */ '🇲🇩', /* Montenegro */ '🇲🇪',
+                    /* North Macedonia */ '🇲🇰', /* Malta */ '🇲🇹', /* Netherlands */ '🇳🇱', /* Norway */ '🇳🇴',
+                    /* Poland */ '🇵🇱', /* Portugal */ '🇵🇹', /* Romania */ '🇷🇴', /* Serbia */ '🇷🇸',
+                    /* Russia */ '🇷🇺', /* Sweden */ '🇸🇪', /* Slovenia */ '🇸🇮', /* Slovakia */ '🇸🇰',
+                    /* San Marino */ '🇸🇲', /* Ukraine */ '🇺🇦', /* Vatican City */ '🇻🇦', /* Kosovo */ '🇽🇰',
+                    /* England */ '🏴󠁧󠁢󠁥󠁮󠁧󠁿', /* Scotland */ '🏴󠁧󠁢󠁳󠁣󠁴󠁿', /* Wales */ '🏴󠁧󠁢󠁷󠁬󠁳󠁿',
+                    
+                    // Oceania, Island Nations & Territories
+                    /* Ascension Island */ '🇦🇨', /* Antarctica */ '🇦🇶', /* American Samoa */ '🇦🇸',
+                    /* Australia */ '🇦🇺', /* Åland Islands */ '🇦🇽', /* Bouvet Island */ '🇧🇻',
+                    /* Cocos (Keeling) Islands */ '🇨🇨', /* Cook Islands */ '🇨🇰', /* Clipperton Island */ '🇨🇵',
+                    /* Christmas Island */ '🇨🇽', /* Diego Garcia */ '🇩🇬', /* Fiji */ '🇫🇯',
+                    /* Micronesia */ '🇫🇲', /* Greenland */ '🇬🇱',
+                    /* South Georgia & South Sandwich Islands */ '🇬🇸', /* Guam */ '🇬🇺',
+                    /* Heard & McDonald Islands */ '🇭🇲', /* Canary Islands */ '🇮🇨',
+                    /* British Indian Ocean Territory */ '🇮🇴', /* Kiribati */ '🇰🇮', /* Marshall Islands */ '🇲🇭',
+                    /* Northern Mariana Islands */ '🇲🇵', /* New Caledonia */ '🇳🇨', /* Norfolk Island */ '🇳🇫',
+                    /* Nauru */ '🇳🇷', /* Niue */ '🇳🇺', /* New Zealand */ '🇳🇿', /* French Polynesia */ '🇵🇫',
+                    /* Papua New Guinea */ '🇵🇬', /* Pitcairn Islands */ '🇵🇳', /* Palau */ '🇵🇼',
+                    /* Réunion */ '🇷🇪', /* Solomon Islands */ '🇸🇧', /* St. Helena */ '🇸🇭',
+                    /* Svalbard & Jan Mayen */ '🇸🇯', /* São Tomé & Príncipe */ '🇸🇹',
+                    /* Tristan Da Cunha */ '🇹🇦', /* French Southern Territories */ '🇹🇫', /* Tokelau */ '🇹🇰',
+                    /* Tonga */ '🇹🇴', /* Tuvalu */ '🇹🇻', /* U.S. Outlying Islands */ '🇺🇲',
+                    /* St. Vincent & Grenadines */ '🇻🇨', /* Vanuatu */ '🇻🇺', /* Wallis & Futuna */ '🇼🇫',
+                    /* Samoa */ '🇼🇸', /* Mayotte */ '🇾🇹'
+                ],
+                fantasy: [
+                    '🧙‍♀️', '🧚‍♀️', '🧚‍♀️', '🧚‍♀️', '🧛‍♀️', '🧜‍♀️', '🧜‍♀️', '🧜‍♀️', '🦸‍♀️', '🦹‍♀️', '👸', '🐉', '🐲', '🦄', '🦄', '🦄', '🦄'
+                ],
+                faces: [
+                    '😃', '😄', '😊', '🙂'
+                ],
+                halloween: [
+                    '🎃', '👻', '👹', '👺', '🤡', '💀', '👽', '👾', '🤖', '🧛‍♂️', '🦇',
+                    '🧛‍♀️'
+                ],
+                zodiac: [
+                    '♈', '🐏', '♉', '🐂', '♊', '👬', '♋', '🦀', '♌', '🦁', '♍',
+                    '👧', '♎', '⚖️', '♏️', '🦂', '♐️', '🏹', '♑️', '🐐', '♒️', '🏺',
+                    '♓️', '🐟'
+                ],
+                chineseZodiac: [
+                    '🐂', '🐀', '🐖', '🐶', '🐓', '🐒', '🐏', '🎠', '🐍', '🐲', '🐉',
+                    '🐇', '🐅'
+                ],
+                christmas: [
+                    '🎄', '🎅', '🎁', '🎈', '🎉', '🎊', '🎋', '🎍', '🎎', '🎏',
+                    '🎐', '🎑', '🎒', '🎓', '🎔', '🎕', '🎖', '🎗', '🎘', '🎙',
+                    '🎚', '🎛', '🎜', '🎝', '🎞', '🎟', '🎠', '🎡', '🎢', '🎣',
+                    '🎤', '🎥', '🎦', '🎧', '🎨', '🎪', '🎫', '🎭', '🎮', '🎯',
+                    '🎰', '🎱', '🎲', '🎳', '🎴', '🎵', '🎶', '🎷', '🎸', '🎹',
+                    '🎺', '🎻', '🎼', '🎽', '🎾', '🎿', '🏀', '🏁', '🏂',
+                ],
+                sports: [
+                    '⚽', '⛳', '⛸', '🏀', '🏆', '🏇', '🏈', '🏉', '🏊', '🏋️‍♀️',
+                    '🏌️‍♀️', '🏎️', '🏏', '🏑', '🏒', '🏓', '🏸', '🏹',
+                ],
+                music: [
+                    '🎤', '🎧', '🎨', '🎪', '🎫', '🎭', '🎮', '🎯', '🎰', '🎱',
+                    '🎲', '🎳', '🎴', '🎵', '🎶', '🎷', '🎸', '🎹', '🎺', '🎻',
+                    '🎼',
+                ]
+            };
+
+            // Quadrant balancing system for better emoji distribution
+            function getQuadrant(x, y, gridWidth, gridHeight) {
+                const midX = gridWidth / 2;
+                const midY = gridHeight / 2;
+                
+                if (x < midX && y < midY) return 0;      // Top-left
+                if (x >= midX && y < midY) return 1;     // Top-right
+                if (x < midX && y >= midY) return 2;     // Bottom-left
+                return 3;                                 // Bottom-right
+            }
+
+            function getWeightedQuadrant(quadrantCounts) {
+                const distributionIntensity = document.getElementById('distributionIntensity')?.value || 'balanced';
+                const total = quadrantCounts.reduce((sum, count) => sum + count, 0);
+                
+                let weights;
+                switch (distributionIntensity) {
+                    case 'strong':
+                        // Strong preference for less-populated quadrants
+                        weights = quadrantCounts.map(count => Math.max(1, (total - count) * 3));
+                        break;
+                    case 'weak':
+                        // Weak preference for less-populated quadrants
+                        weights = quadrantCounts.map(count => Math.max(1, (total - count) * 0.5));
+                        break;
+                    default: // 'balanced'
+                        // Balanced preference for less-populated quadrants
+                        weights = quadrantCounts.map(count => Math.max(1, total - count));
+                        break;
+                }
+                
+                const totalWeight = weights.reduce((sum, weight) => sum + weight, 0);
+                
+                let random = Math.random() * totalWeight;
+                for (let i = 0; i < weights.length; i++) {
+                    random -= weights[i];
+                    if (random <= 0) return i;
+                }
+                return 0; // fallback
+            }
+
+            function getPositionInQuadrant(quadrant, gridWidth, gridHeight) {
+                const midX = gridWidth / 2;
+                const midY = gridHeight / 2;
+                
+                let minX, maxX, minY, maxY;
+                
+                switch (quadrant) {
+                    case 0: // Top-left
+                        minX = 15;
+                        maxX = midX - 15;
+                        minY = 15;
+                        maxY = midY - 15;
+                        break;
+                    case 1: // Top-right
+                        minX = midX + 15;
+                        maxX = gridWidth - 30;
+                        minY = 15;
+                        maxY = midY - 15;
+                        break;
+                    case 2: // Bottom-left
+                        minX = 15;
+                        maxX = midX - 15;
+                        minY = midY + 15;
+                        maxY = gridHeight - 30;
+                        break;
+                    case 3: // Bottom-right
+                        minX = midX + 15;
+                        maxX = gridWidth - 30;
+                        minY = midY + 15;
+                        maxY = gridHeight - 30;
+                        break;
+                }
+                
+                // Add some randomization within the quadrant
+                const x = minX + Math.random() * (maxX - minX);
+                const y = minY + Math.random() * (maxY - minY);
+                
+                return { x, y };
+            }
+
+            // Get selected categories from checkboxes
+            const allCheckbox = document.getElementById('cat-all');
+            const otherCheckboxes = document.querySelectorAll('.category-option input[type="checkbox"]:not(#cat-all)');
+            
+            console.log('🎯 EMOJI GENERATION DEBUG 🎯');
+            console.log('EMOJI GEN - All checkbox state:', allCheckbox.checked);
+            console.log('EMOJI GEN - All other checkbox states:', Array.from(otherCheckboxes).map(cb => `${cb.value}: ${cb.checked}`));
+            
+            let selectedCategories = [];
+            if (allCheckbox.checked) {
+                selectedCategories = ['all'];
+                console.log('EMOJI GEN - Using ALL categories (allCheckbox.checked = true)');
+            } else {
+                selectedCategories = Array.from(otherCheckboxes)
+                    .filter(cb => cb.checked)
+                    .map(cb => cb.value);
+                console.log('EMOJI GEN - Selected specific categories:', selectedCategories);
+            }
+            
+            // If "all" is selected or no categories are selected, use all categories
+            const positiveEmojis = selectedCategories.includes('all') || selectedCategories.length === 0
+                ? Object.values(emojiCategories).flat()
+                : selectedCategories.flatMap(category => emojiCategories[category] || []);
+            
+            console.log('EMOJI GEN - Final logic: selectedCategories.includes("all"):', selectedCategories.includes('all'), 
+                       '|| selectedCategories.length === 0:', selectedCategories.length === 0);
+            console.log('EMOJI GEN - Using emoji count:', positiveEmojis.length > 0 ? positiveEmojis.length : 'ALL CATEGORIES');
+            console.log('🎯 END EMOJI GENERATION DEBUG 🎯');
+
+            // Remove duplicates from the emoji array to ensure uniqueness
+            const uniqueEmojis = [...new Set(positiveEmojis)];
+            
+            // Limit emoji count to available unique emojis
+            const actualEmojiCount = Math.min(emojiCountParam, uniqueEmojis.length);
+            
+            // Shuffle the unique emojis array
+            const shuffledEmojis = [...uniqueEmojis].sort(() => Math.random() - 0.5);
+
+            const placedEmojis = [];
+            const quadrantCounts = [0, 0, 0, 0]; // Track emoji count per quadrant
+
+            for (let i = 0; i < actualEmojiCount; i++) {
+                let attempts = 0;
+                let validPosition = false;
+
+                while (!validPosition && attempts < 100) {
+                    // Use quadrant balancing to select placement area
+                    const selectedQuadrant = getWeightedQuadrant(quadrantCounts);
+                    const position = getPositionInQuadrant(selectedQuadrant, gridWidth, gridHeight);
+                    const x = position.x;
+                    const y = position.y;
+
+                    // Check overlap with stickers
+                    const overlapsStickerSpots = finalSpots.some(spot =>
+                        x >= spot.x - 25 && x <= spot.x + spot.size + 25 &&
+                        y >= spot.y - 25 && y <= spot.y + spot.size + 25
+                    );
+
+                    // Check 50px radius from other emojis
+                    const overlapsEmojis = placedEmojis.some(emojiPos => {
+                        const distance = Math.sqrt((x - emojiPos.x) ** 2 + (y - emojiPos.y) ** 2);
+                        return distance < 50;
+                    });
+
+                    if (!overlapsStickerSpots && !overlapsEmojis) {
+                        const emoji = document.createElement('div');
+                        emoji.className = 'emoji-decoration';
+                        // Use the emoji at index i from the shuffled array (ensuring uniqueness)
+                        emoji.textContent = shuffledEmojis[i];
+
+                        // Parse emoji size range from form
+                        const sizeRange = document.getElementById('emojiSize')?.value || '16-28';
+                        const [minSize, maxSize] = sizeRange.split('-').map(s => parseInt(s.trim()) || 16);
+                        const actualMaxSize = maxSize || minSize;
+                        const randomSize = Math.floor(Math.random() * (actualMaxSize - minSize + 1)) + minSize;
+
+                        emoji.style.fontSize = randomSize + 'px';
+                        emoji.style.left = x + 'px';
+                        emoji.style.top = y + 'px';
+                        grid.appendChild(emoji);
+
+                        placedEmojis.push({ x, y });
+                        
+                        // Update quadrant count for this placement
+                        const quadrant = getQuadrant(x, y, gridWidth, gridHeight);
+                        quadrantCounts[quadrant]++;
+                        
+                        validPosition = true;
+                    }
+
+                    attempts++;
+                }
+            }
+            
+            // Update the debug display to show quadrant distribution
+            const debugElement = document.getElementById('quadrantDebug');
+            if (debugElement) {
+                debugElement.innerHTML = `Quadrant Distribution: <br>TL: ${quadrantCounts[0]} | TR: ${quadrantCounts[1]} | BL: ${quadrantCounts[2]} | BR: ${quadrantCounts[3]}`;
+            }
+        }
+
+        // Calculate dynamic sizing for milestone circles
+        function calculateMilestoneDimensions(totalCircles, isTableFormat) {
+            const containerWidth = isTableFormat ? 1456 : 920; // Account for padding
+            
+            // Better size ranges - keep larger minimum sizes
+            const minMilestoneSize = 35;
+            const maxMilestoneSize = 45;
+            const minSmallSize = 16;
+            const maxSmallSize = 20;
+            const minGap = 3;
+            const maxGap = 6;
+
+            // Start with optimal sizes
+            let milestoneSize = maxMilestoneSize;
+            let smallSize = maxSmallSize;
+            let gap = maxGap;
+
+            // Calculate total width with current dimensions
+            let estimatedWidth = totalCircles * Math.max(milestoneSize, smallSize) + (totalCircles - 1) * gap;
+
+            // If it doesn't fit, reduce gradually but prioritize keeping reasonable sizes
+            if (estimatedWidth > containerWidth) {
+                // First try reducing gap
+                const neededReduction = estimatedWidth - containerWidth;
+                const maxGapReduction = (maxGap - minGap) * (totalCircles - 1);
+                
+                if (neededReduction <= maxGapReduction) {
+                    // Can solve by just reducing gap
+                    gap = Math.max(minGap, gap - (neededReduction / (totalCircles - 1)));
+                } else {
+                    // Reduce gap to minimum and then scale sizes
+                    gap = minGap;
+                    const remainingReduction = neededReduction - maxGapReduction;
+                    const scaleFactor = 1 - (remainingReduction / (totalCircles * Math.max(milestoneSize, smallSize)));
+                    
+                    milestoneSize = Math.max(minMilestoneSize, Math.floor(milestoneSize * scaleFactor));
+                    smallSize = Math.max(minSmallSize, Math.floor(smallSize * scaleFactor));
+                }
+            }
+
+            return { milestoneSize, smallSize, gap };
+        }
+
+        // Generate milestones based on sticker range
+        function generateMilestones(startNum, endNum, containerId) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+
+            const emojis = ['🎈', '🎁', '🌟', '🎉', '🏆', '⭐', '🎊', '🎯', '💫', '🌈'];
+            const isTableFormat = containerId.includes('tabloid');
+
+            // Calculate milestone range - every 10 stickers
+            const firstMilestone = Math.ceil(startNum / 10) * 10;
+            const lastMilestone = Math.floor(endNum / 10) * 10;
+
+            // Count total circles needed
+            const milestoneCount = Math.floor((lastMilestone - firstMilestone) / 10) + 1;
+            const smallCircleCount = milestoneCount * 9 + 9; // 9 before first + 9 after each milestone except last
+            const totalCircles = milestoneCount + smallCircleCount;
+
+            // Calculate dynamic dimensions
+            const { milestoneSize, smallSize, gap } = calculateMilestoneDimensions(totalCircles, isTableFormat);
+
+            // Apply dynamic sizing to the container
+            container.style.gap = gap + 'px';
+
+            // Add 9 small circles before first milestone
+            for (let i = 0; i < 9; i++) {
+                const smallCircle = document.createElement('div');
+                smallCircle.className = 'small-circle dynamic-small';
+                smallCircle.style.width = smallSize + 'px';
+                smallCircle.style.height = smallSize + 'px';
+                container.appendChild(smallCircle);
+            }
+
+            // Generate milestones and small circles
+            for (let milestone = firstMilestone; milestone <= lastMilestone; milestone += 10) {
+                const milestoneDiv = document.createElement('div');
+                milestoneDiv.className = 'milestone dynamic-milestone';
+                milestoneDiv.style.width = milestoneSize + 'px';
+                milestoneDiv.style.height = milestoneSize + 'px';
+                milestoneDiv.style.fontSize = Math.max(10, milestoneSize * 0.25) + 'px';
+                
+                const emojiIndex = Math.floor(milestone / 10 - 1) % emojis.length;
+                milestoneDiv.innerHTML = `${milestone}<br>${emojis[emojiIndex]}`;
+                container.appendChild(milestoneDiv);
+
+                // Add 9 small circles after each milestone (except the last)
+                if (milestone < lastMilestone) {
+                    for (let i = 0; i < 9; i++) {
+                        const smallCircle = document.createElement('div');
+                        smallCircle.className = 'small-circle dynamic-small';
+                        smallCircle.style.width = smallSize + 'px';
+                        smallCircle.style.height = smallSize + 'px';
+                        container.appendChild(smallCircle);
+                    }
+                }
+            }
+        }
+
+        // Generate sticker spots with bell curve distribution
+        function generateStickerSpots(gridId, maxRetries, startNum) {
+            const grid = document.getElementById(gridId);
+            grid.innerHTML = '';
+            const gridWidth = gridId === 'letter-grid' ? 960 : 1536;
+            const gridHeight = gridId === 'letter-grid' ? 525 : 760;
+            const placedSpots = [];
+
+            let attempts = 0;
+
+            while (attempts < maxRetries) {
+                const sizes = [];
+                sizes.push(36, 180); // Guaranteed min/max
+
+                for (let i = 2; i < 80; i++) {
+                    sizes.push(bellCurveSize());
+                }
+
+                placedSpots.length = 0;
+                let placed = 0;
+
+                for (let i = 0; i < sizes.length; i++) {
+                    const size = sizes[i];
+                    let position;
+                    let posAttempts = 0;
+                    let canPlace = false;
+
+                    while (posAttempts < 100 && !canPlace) {
+                        position = {
+                            x: Math.random() * (gridWidth - size - 5) + 10,
+                            y: Math.random() * (gridHeight - size - 5) + 10,
+                            size: size
+                        };
+
+                        canPlace = !placedSpots.some(spot =>
+                            position.x < spot.x + spot.size + 10 &&
+                            position.x + position.size + 10 > spot.x &&
+                            position.y < spot.y + spot.size + 10 &&
+                            position.y + position.size + 10 > spot.y
+                        );
+
+                        posAttempts++;
+                    }
+
+                    if (canPlace) {
+                        placedSpots.push(position);
+                        placed++;
+                    }
+                }
+
+                attempts++;
+                if (placed >= 15) break;
+            }
+
+            // Trim to last multiple of 10
+            const lastMultipleOf10 = Math.floor((startNum + placedSpots.length - 1) / 10) * 10;
+            const maxStickers = lastMultipleOf10 - startNum + 1;
+            const finalSpots = placedSpots.slice(0, maxStickers);
+
+            // Create DOM elements
+            finalSpots.forEach((position, index) => {
+                const spot = document.createElement('div');
+                spot.className = 'sticker-spot';
+                spot.style.left = position.x + 'px';
+                spot.style.top = position.y + 'px';
+                spot.style.width = position.size + 'px';
+                spot.style.height = position.size + 'px';
+
+                const numberPositions = [
+                    { top: '-8px', left: '-8px' },
+                    { top: '-8px', right: '-8px' },
+                    { bottom: '-8px', left: '-8px' },
+                    { bottom: '-8px', right: '-8px' }
+                ];
+                const randomPos = numberPositions[Math.floor(Math.random() * numberPositions.length)];
+
+                const numberDiv = document.createElement('div');
+                numberDiv.className = 'sticker-number';
+                numberDiv.textContent = startNum + index;
+                Object.assign(numberDiv.style, randomPos);
+
+                spot.appendChild(numberDiv);
+                grid.appendChild(spot);
+            });
+
+            // Generate milestones based on actual sticker count
+            const endNum = startNum + finalSpots.length - 1;
+            const milestoneId = gridId === 'letter-grid' ? 'letter-milestones' : 'tabloid-milestones';
+            generateMilestones(startNum, endNum, milestoneId);
+
+            // Add emoji decorations
+            const emojiCount = parseInt(document.getElementById('emojiCount')?.value) || 15;
+            generateEmojiDecorations(gridId, finalSpots, emojiCount);
+
+            console.log(`Placed ${finalSpots.length} stickers (${startNum}-${endNum}) in ${gridId}`);
+        }
+
+        // Initialize grids
+        generateStickerSpots('letter-grid', 20, 1);
+        generateStickerSpots('tabloid-grid', 30, 1);
+
+        // Regenerate function
+        function regenerateStickers() {
+            const pageNum = document.getElementById('pageNumber').value;
+            const startNum = parseInt(document.getElementById('startNumber').value);
+            const maxRetries = parseInt(document.getElementById('minBlocks').value);
+            const currentPage = document.querySelector('.album-page.active').id;
+            const gridId = currentPage === 'letter-page' ? 'letter-grid' : 'tabloid-grid';
+
+            document.getElementById('pageNumberDisplay').textContent = pageNum;
+            document.getElementById('pageNumberDisplay2').textContent = pageNum;
+
+            generateStickerSpots(gridId, maxRetries, startNum);
+        }
+
+        // Page switching
+        function showPage(pageType) {
+            document.querySelectorAll('.album-page').forEach(page => {
+                page.classList.remove('active');
+            });
+            document.querySelectorAll('.page-selector button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            document.getElementById(pageType + '-page').classList.add('active');
+            document.getElementById(pageType + '-btn').classList.add('active');
+
+            const minBlocksInput = document.getElementById('minBlocks');
+            minBlocksInput.value = pageType === 'letter' ? 20 : 30;
+        }
+
+        // Click functionality for sticker spots
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.sticker-spot')) {
+                const spot = e.target.closest('.sticker-spot');
+                spot.classList.toggle('filled');
+                spot.innerHTML = spot.classList.contains('filled') ?
+                    spot.innerHTML + '<span style="font-size:20px;">⭐</span>' :
+                    spot.querySelector('.sticker-number').outerHTML;
+            }
+        });
+
+        // Category Selector Functions - Simple and Reliable
+        function toggleCategoryList() {
+            const categoryList = document.getElementById('categoryList');
+            const toggleArrow = document.querySelector('.toggle-arrow');
+            
+            if (categoryList.style.display === 'none') {
+                categoryList.style.display = 'block';
+                toggleArrow.style.transform = 'rotate(180deg)';
+            } else {
+                categoryList.style.display = 'none';
+                toggleArrow.style.transform = 'rotate(0deg)';
+            }
+        }
+
+        // Flag to prevent recursive calls during programmatic checkbox changes
+        let isUpdatingCategories = false;
+
+        function updateCategorySelection(clickedCheckbox = null) {
+            // Prevent recursive calls
+            if (isUpdatingCategories) return;
+            isUpdatingCategories = true;
+            
+            console.log('=== updateCategorySelection START ===');
+            console.log('Clicked checkbox:', clickedCheckbox ? `${clickedCheckbox.id} (${clickedCheckbox.checked})` : 'none');
+            
+            const allCheckbox = document.getElementById('cat-all');
+            const otherCheckboxes = document.querySelectorAll('.category-option input[type="checkbox"]:not(#cat-all)');
+            const displayElement = document.getElementById('selectedCategoriesDisplay');
+            
+            console.log('Before - All checkbox DOM state:', allCheckbox.checked);
+            console.log('Before - Nature checkbox DOM state:', document.getElementById('cat-nature')?.checked);
+            console.log('Before - Activities checkbox DOM state:', document.getElementById('cat-activities')?.checked);
+            console.log('Before - Other checkboxes states:', Array.from(otherCheckboxes).map(cb => `${cb.value}: ${cb.checked}`));
+            
+            // NEW LOGIC: Handle based on which checkbox was actually clicked
+            if (clickedCheckbox && clickedCheckbox.id === 'cat-all' && clickedCheckbox.checked) {
+                // User clicked "All Categories" and checked it → uncheck all others
+                console.log('🎯 ALL CATEGORIES was clicked and checked → unchecking others');
+                otherCheckboxes.forEach(cb => cb.checked = false);
+                displayElement.textContent = 'All Categories';
+            } else {
+                // User clicked an individual category OR unchecked "All Categories"
+                console.log('🎯 Individual category clicked or All Categories unchecked');
+                const checkedCategories = Array.from(otherCheckboxes).filter(cb => cb.checked);
+                
+                if (checkedCategories.length > 0) {
+                    // Individual categories are selected → uncheck "All Categories"
+                    console.log('🎯 Individual categories selected → unchecking All Categories');
+                    allCheckbox.checked = false;
+                    // Update display text
+                    if (checkedCategories.length === 1) {
+                        displayElement.textContent = checkedCategories[0].value.charAt(0).toUpperCase() + checkedCategories[0].value.slice(1);
+                    } else {
+                        displayElement.textContent = `${checkedCategories.length} Categories`;
+                    }
+                } else {
+                    // No individual categories selected → fallback to "All Categories"
+                    console.log('🎯 No categories selected → falling back to All Categories');
+                    allCheckbox.checked = true;
+                    displayElement.textContent = 'All Categories';
+                }
+            }
+            
+            console.log('After - All checkbox DOM state:', allCheckbox.checked);
+            console.log('After - Nature checkbox DOM state:', document.getElementById('cat-nature')?.checked);
+            console.log('After - Activities checkbox DOM state:', document.getElementById('cat-activities')?.checked);
+            console.log('After - Other checkboxes states:', Array.from(otherCheckboxes).map(cb => `${cb.value}: ${cb.checked}`));
+            console.log('=== updateCategorySelection END ===');
+            
+            // Reset flag to allow future updates
+            isUpdatingCategories = false;
+        }
+
+        // Simple event setup when page loads
+        window.addEventListener('load', function() {
+            console.log('Setting up category selector...');
+            
+            // Add change events to all checkboxes
+            const allCheckboxes = document.querySelectorAll('.category-option input[type="checkbox"]');
+            console.log(`Found ${allCheckboxes.length} checkboxes`);
+            
+            allCheckboxes.forEach((checkbox, index) => {
+                console.log(`Setting up checkbox ${index}: ID=${checkbox.id}, value=${checkbox.value}, initial checked=${checkbox.checked}`);
+                
+                checkbox.addEventListener('change', function(e) {
+                    console.log(`🔄 CHECKBOX EVENT: ${index} (${this.id}) changed:`, this.value, this.checked);
+                    console.log(`Event target checked:`, e.target.checked);
+                    console.log(`DOM element checked:`, document.getElementById(this.id).checked);
+                    console.log(`Same element?`, this === e.target, this === document.getElementById(this.id));
+                    
+                    // Check if DOM state matches event state
+                    setTimeout(() => {
+                        console.log(`📍 POST-EVENT DOM CHECK: ${this.id} DOM state:`, document.getElementById(this.id).checked);
+                    }, 0);
+                    
+                    // Pass the clicked checkbox to updateCategorySelection
+                    updateCategorySelection(this);
+                });
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.category-selector')) {
+                    const categoryList = document.getElementById('categoryList');
+                    const toggleArrow = document.querySelector('.toggle-arrow');
+                    if (categoryList && categoryList.style.display !== 'none') {
+                        categoryList.style.display = 'none';
+                        if (toggleArrow) {
+                            toggleArrow.style.transform = 'rotate(0deg)';
+                        }
+                    }
+                }
+            });
+            
+            console.log('Category selector setup complete');
+        });
+    </script>
+</body>
+</html>
