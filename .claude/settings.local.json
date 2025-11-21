@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//d/src/worktrees/LifeHacking/AlbumFall/**)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(gh repo view:*)",
+      "Bash(gh api:*)"
+    ]
+  },
+  "disabledMcpjsonServers": [
+    "todo"
+  ]
+}
